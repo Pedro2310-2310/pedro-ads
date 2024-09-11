@@ -1,0 +1,295 @@
+
+
+#include <stdio.h>
+#include <string.h>
+
+#define LIMITE_CLIENTES 100
+
+// Estrutura para armazenar os dados de cada cliente
+typedef struct {
+    char nome[100];  
+    char cpf[12];    
+    double saldo;    
+} DadosCliente;
+
+// Lista de clientes e contador
+DadosCliente listaClientes[LIMITE_CLIENTES];
+int totalClientes = 0; 
+
+// Função para adicionar um novo cliente ao sistema
+void adicionarNovoCliente() {
+    if (totalClientes >= LIMITE_CLIENTES) {
+        printf("O banco atingiu o limite de clientes cadastrados. Não é possível adicionar mais clientes.\n");
+        return;
+    }
+    printf("Vamos adicionar um novo cliente!\n");
+    printf("Nome completo: ");
+    scanf(" %[^\n]", listaClientes[totalClientes].nome);
+    printf("CPF (somente números): ");
+    scanf("%s", listaClientes[totalClientes].cpf);
+    printf("Saldo inicial da conta: ");
+    scanf("%lf", &listaClientes[totalClientes].saldo);
+    printf("Cliente '%s' adicionado com sucesso!\n", listaClientes[totalClientes].nome);
+    totalClientes++;
+}
+
+// Função para exibir todos os clientes cadastrados
+void exibirTodosClientes() {
+    if (totalClientes == 0) {
+        printf("Nenhum cliente encontrado no sistema.\n");
+        return;
+    }
+    printf("Aqui estão todos os clientes cadastrados no banco:\n");
+    for (int i = 0; i < totalClientes; i++) {
+        printf("Cliente %d:\n", i + 1);
+        printf("Nome: %s\n", listaClientes[i].nome);
+        printf("CPF: %s\n", listaClientes[i].cpf);
+        printf("Saldo: R$ %.2f\n\n", listaClientes[i].saldo);
+    }
+}
+
+// Função para atualizar o saldo de um cliente
+void atualizarSaldoCliente() {
+    char cpf[12];
+    double novoSaldo;
+    printf("Por favor, informe o CPF do cliente cujo saldo você quer atualizar: ");
+    scanf("%s", cpf);
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(listaClientes[i].cpf, cpf) == 0) {
+            printf("Saldo atual: R$ %.2f\n", listaClientes[i].saldo);
+            printf("Qual será o novo saldo? ");
+            scanf("%lf", &novoSaldo);
+            listaClientes[i].saldo = novoSaldo;
+            printf("O saldo foi atualizado com sucesso! O novo saldo é R$ %.2f\n", listaClientes[i].saldo);
+            return;
+        }
+    }
+    printf("Desculpe, nenhum cliente encontrado com o CPF '%s'.\n", cpf);
+}
+
+// Função para atualizar o nome de um cliente
+void atualizarNomeCliente() {
+    char cpf[12];
+    printf("Informe o CPF do cliente para alterar o nome: ");
+    scanf("%s", cpf);
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(listaClientes[i].cpf, cpf) == 0) {
+            printf("Nome atual: %s\n", listaClientes[i].nome);
+            printf("Digite o novo nome: ");
+            scanf(" %[^\n]", listaClientes[i].nome);
+            printf("Nome alterado com sucesso para '%s'.\n", listaClientes[i].nome);
+            return;
+        }
+    }
+    printf("Nenhum cliente encontrado com o CPF '%s'.\n", cpf);
+}
+
+// Função para alterar o CPF de um cliente
+void atualizarCPFCliente() {
+    char cpfAntigo[12], cpfNovo[12];
+    printf("Informe o CPF do cliente que deseja alterar: ");
+    scanf("%s", cpfAntigo);
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(listaClientes[i].cpf, cpfAntigo) == 0) {
+            printf("Digite o novo CPF: ");
+            scanf("%s", cpfNovo);
+            strcpy(listaClientes[i].cpf, cpfNovo);
+            printf("CPF atualizado com sucesso! Novo CPF: '%s'.\n", listaClientes[i].cpf);
+            return;
+        }
+    }
+    printf("Nenhum cliente encontrado com o CPF '%s'.\n", cpfAntigo);
+}
+
+// Função para remover um cliente
+void removerCliente() {
+    char cpf[12];
+    printf("Informe o CPF do cliente que deseja remover: ");
+    scanf("%s", cpf);
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(listaClientes[i].cpf, cpf) == 0) {
+            printf("Removendo o cliente '%s'...\n", listaClientes[i].nome);
+            for (int j = i; j < totalClientes - 1; j++) {
+                listaClientes[j] = listaClientes[j + 1];
+            }
+            totalClientes--;
+            printf("Cliente removido com sucesso!\n");
+            return;
+        }
+    }
+    printf("Nenhum cliente encontrado com o CPF '%s'.\n", cpf);
+}
+
+// Função para o cliente visualizar seu saldo
+void verSaldoCliente(char cpf[]) {
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(listaClientes[i].cpf, cpf) == 0) {
+            printf("O saldo atual da conta de '%s' (CPF: %s) é R$ %.2f\n", listaClientes[i].nome, listaClientes[i].cpf, listaClientes[i].saldo);
+            return;
+        }
+    }
+    printf("Desculpe, não encontramos nenhuma conta com o CPF '%s'.\n", cpf);
+}
+
+// Função para o cliente depositar dinheiro na conta
+void depositarValor(char cpf[]) {
+    double valor;
+    printf("Qual o valor que deseja depositar? ");
+    scanf("%lf", &valor);
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(listaClientes[i].cpf, cpf) == 0) {
+            listaClientes[i].saldo += valor;
+            printf("Depósito de R$ %.2f realizado com sucesso! Saldo atual: R$ %.2f\n", valor, listaClientes[i].saldo);
+            return;
+        }
+    }
+    printf("Desculpe, não encontramos nenhuma conta com o CPF '%s'.\n", cpf);
+}
+
+// Função para o cliente sacar dinheiro
+void sacarValor(char cpf[]) {
+    double valor;
+    printf("Qual valor você deseja sacar? ");
+    scanf("%lf", &valor);
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(listaClientes[i].cpf, cpf) == 0) {
+            if (listaClientes[i].saldo >= valor) {
+                listaClientes[i].saldo -= valor;
+                printf("Saque de R$ %.2f realizado com sucesso! Saldo atual: R$ %.2f\n", valor, listaClientes[i].saldo);
+            } else {
+                printf("Saldo insuficiente para realizar o saque.\n");
+            }
+            return;
+        }
+    }
+    printf("Nenhuma conta encontrada com o CPF '%s'.\n", cpf);
+}
+
+// Função para transferir dinheiro de uma conta para outra
+void transferirValor(char cpfOrigem[], char cpfDestino[]) {
+    double valor;
+    printf("Quanto você deseja transferir? ");
+    scanf("%lf", &valor);
+
+    DadosCliente *contaOrigem = NULL, *contaDestino = NULL;
+    for (int i = 0; i < totalClientes; i++) {
+        if (strcmp(listaClientes[i].cpf, cpfOrigem) == 0) {
+            contaOrigem = &listaClientes[i];
+        }
+        if (strcmp(listaClientes[i].cpf, cpfDestino) == 0) {
+            contaDestino = &listaClientes[i];
+        }
+    }
+
+    if (contaOrigem == NULL || contaDestino == NULL) {
+        printf("Uma ou ambas as contas não foram encontradas.\n");
+        return;
+    }
+
+    if (contaOrigem->saldo >= valor) {
+        contaOrigem->saldo -= valor;
+        contaDestino->saldo += valor;
+        printf("Transferência de R$ %.2f realizada com sucesso! Saldo atual de '%s': R$ %.2f\n", valor, contaOrigem->nome, contaOrigem->saldo);
+    } else {
+        printf("Saldo insuficiente para realizar a transferência.\n");
+    }
+}
+
+int main() {
+
+
+#define CODIGO_CORRETO "1234" // Defina aqui o código correto
+
+    char codigo[10];
+
+    printf("por favor Digite o código de acesso: ");
+    scanf("%s", codigo);
+    printf("\n");
+    while (strcmp(codigo, CODIGO_CORRETO) != 0) { // Enquanto o código estiver errado
+        printf("***Acesso negado. Código incorreto!***\n");
+         printf("\n");
+        printf("Por favor Digite o código de acesso novamente: ");
+        scanf("%s", codigo); // Solicita novamente até ser correto
+    }
+
+    printf("Acesso concedido!\n");
+    printf("\n");
+
+    
+
+    
+
+
+    int opcao;
+    char cpf[12], cpfDestino[12];
+
+    while (1) {
+        printf("--- Olá professor Felipe seja  Bem-vindo ao ADS Bank ---\n");
+        
+        printf("\n");
+       
+        printf("1. Adicionar novo cliente\n");
+        printf("2. Listar todos os clientes\n");
+        printf("3. Atualizar saldo do cliente\n");
+        printf("4. Alterar CPF do cliente\n");
+        printf("5. Alterar nome do cliente\n");
+        printf("6. Remover cliente\n");
+        printf("7. Ver saldo da conta\n");
+        printf("8. Depositar dinheiro\n");
+        printf("9. Sacar dinheiro\n");
+        printf("10. Transferir dinheiro\n");
+        printf("11. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        switch (opcao) {
+            case 1:
+                adicionarNovoCliente();
+                break;
+            case 2:
+                exibirTodosClientes();
+                break;
+            case 3:
+                atualizarSaldoCliente();
+                break;
+            case 4:
+                atualizarCPFCliente();
+                break;
+            case 5:
+                atualizarNomeCliente();
+                break;
+            case 6:
+                removerCliente();
+                break;
+            case 7:
+                printf("Digite o CPF para ver o saldo: ");
+                scanf("%s", cpf);
+                verSaldoCliente(cpf);
+                break;
+            case 8:
+                printf("Digite o CPF para depositar: ");
+                scanf("%s", cpf);
+                depositarValor(cpf);
+                break;
+            case 9:
+                printf("Digite o CPF para sacar: ");
+                scanf("%s", cpf);
+                sacarValor(cpf);
+                break;
+            case 10:
+                printf("Digite o CPF da conta de origem: ");
+                scanf("%s", cpf);
+                printf("Digite o CPF da conta de destino: ");
+                scanf("%s", cpfDestino);
+                transferirValor(cpf, cpfDestino);
+                break;
+            case 11:
+                printf("Saindo...\n");
+                return 0;
+            default:
+                printf("Opção inválida! Tente novamente.\n");
+                break;
+        }
+    }
+
+    return 0;
+}
